@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/25 15:30:45 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/25 15:50:13 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ struct s_wall2	{
 	int position;
 };
 
-struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
+struct s_wall2	get_wall(t_param *param, t_ray *ray)
 {
 //	printf("get_wall(%.2f, %.2f, %.2f)\n", ray->x, ray->y, ray->angle);
 	int grid_y = (int) ray->y;
@@ -94,7 +94,7 @@ struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (map[grid_y][grid_x])
+				if (param->map[grid_y][grid_x])
 				{
 					if (ray->angle < M_PI_2)
 					{
@@ -110,7 +110,7 @@ struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
 				}
 			}
 			grid_y++;
-			if (map[grid_y][grid_x])
+			if (param->map[grid_y][grid_x])
 			{
 				wall.type = NORTH;
 				wall.position = grid_y;
@@ -124,7 +124,7 @@ struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (map[grid_y][grid_x])
+				if (param->map[grid_y][grid_x])
 				{
 					if (ray->angle > 3 * M_PI_2)
 					{
@@ -140,7 +140,7 @@ struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
 				}
 			}
 			grid_y--;
-			if (map[grid_y][grid_x])
+			if (param->map[grid_y][grid_x])
 			{
 				wall.type = SOUTH;
 				wall.position = grid_y + 1;
@@ -149,7 +149,7 @@ struct s_wall2	get_wall(t_param *param, t_ray *ray, char map[7][10])
 		}
 }
 
-void	render_pixel(t_param *param, int x, char map[7][10])
+void	render_pixel(t_param *param, int x)
 {
 	t_ray ray;
 
@@ -160,7 +160,7 @@ void	render_pixel(t_param *param, int x, char map[7][10])
 		ray.angle += 2 * M_PI;
 	ray.x = param->player_x;
 	ray.y = param->player_y;
-	struct s_wall2 wall = get_wall(param, &ray, map);
+	struct s_wall2 wall = get_wall(param, &ray);
 	float dist;
 	if (wall.type == WEST || wall.type == EAST)
 	{
@@ -180,26 +180,10 @@ void	render_pixel(t_param *param, int x, char map[7][10])
 
 void	render(t_param *param)
 {
-	char map[7][10] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-		{1, 1, 0, 1, 1, 0, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	};
 	for (int y = 0; y < 720; y++)
 		for (int x = 0; x < 1280; x++)
 			screen_put(param->screen, x, y, 0x333333);
-//	for (int y = 0; y < 7; y++)
-//		for (int x = 0; x < 10; x++)
-//			if (map[y][x])
-//				screen_put(param->screen, x, y, 0x7700FF);
-//	struct s_wall wall1 = {0, 10, 10, 10};
-//	struct s_wall wall2 = {0, 10, 10, 10};
-//	render_strips(param, 300, 980, wall1);
 	for (int x = 0; x < 1280; x++)
-		render_pixel(param, x, map);
+		render_pixel(param, x);
 	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr, param->screen->img_ptr, 0, 0);
 }

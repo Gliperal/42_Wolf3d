@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/26 14:53:44 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/26 16:22:56 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "rendering/rendering.h"
 #include "input/input.h"
 #include "param.h"
+#include "textures.h"
 
 void	render(t_param *param);
 
@@ -112,6 +113,7 @@ int			main(int argc, char **argv)
 		free(param);
 		return 1;
 	}
+	param->textures = load_textures(); // catch errors
 	input_clock_init(param->input);
 	mlx_loop(mlx_ptr);
 }

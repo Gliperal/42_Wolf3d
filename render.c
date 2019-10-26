@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/26 15:06:01 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/26 16:19:57 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,26 +119,36 @@ void	render_strip(t_param *param, int x, struct s_wall wall)
 {
 	float angle = param->player_angle + atan2(640, x - 640);
 	float dist_x, dist_y;
+	int tex_x;
 	if (wall.type == WEST || wall.type == EAST)
 	{
 		dist_x = (float)wall.position - param->player_x;
 		dist_y = dist_x * tan(angle);
+		float foo = fmod(param->player_y + dist_y, 1.0);
+		if (foo < 0.0) foo += 1.0;
+		tex_x = (int) (foo * 8.0);
 	}
 	else
 	{
 		dist_y = (float)wall.position - param->player_y;
 		dist_x = dist_y / tan(angle);
+		float foo = fmod(param->player_x + dist_x, 1.0);
+		if (foo < 0.0) foo += 1.0;
+		tex_x = (int) (foo * 8.0);
 	}
 	float depth = fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle)));
 	float height = 200.0 / depth;
-	int colors[4] = {0x7700FF, 0x00FF77, 0xCC0077, 0x55CC00};
 	int low = 360 - height * 2.5;
 	if (low < 0) low = 0;
 	int high = 360 + height;
 	if (high > 720)
 		high = 720;
 	for (int y = low; y < high; y++)
-		screen_put(param->screen, x, y, colors[wall.type]);
+	{
+		int tex_y = (8 * (y - low)) / (high - low);
+		int color = param->textures[wall.type][tex_y * 8 + tex_x];
+		screen_put(param->screen, x, y, color);
+	}
 }
 
 struct s_wall	get_wall_for_pixel(t_param *param, int x)

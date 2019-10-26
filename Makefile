@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=
-OBJS=main.o render.o $(addprefix input/,input.o input_handlers.o input_handle_loop.o input_util.o) rendering/screen.o
+OBJS=main.o render.o map.o $(addprefix input/,input.o input_handlers.o input_handle_loop.o input_util.o) rendering/screen.o
 FRAMEWORKS=-framework OpenGL -framework AppKit
 RM=rm -rf
 LIBFT=libft
@@ -24,6 +24,8 @@ fclean: clean
 	$(RM) $(NAME)
 	make -C $(LIBFT) fclean
 	make -C $(LIBMLX) clean
+
+re: fclean all
 
 .PHONY: all clean fclean re
 

@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/25 19:09:17 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/26 15:06:01 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ struct s_wall	{
 	int offset;
 };
 
-struct s_wall	get_wall(char map[7][10], t_ray *ray)
+struct s_wall	get_wall(t_map *map, t_ray *ray)
 {
 //	printf("get_wall(%.2f, %.2f, %.2f)\n", ray->x, ray->y, ray->angle);
 	int grid_y = (int) ray->y;
@@ -50,11 +50,11 @@ struct s_wall	get_wall(char map[7][10], t_ray *ray)
 		while (1)
 		{
 			// possible error if tan(angle) = INF ?
-			int intercept_x = (int) (ray->x + ((float)(grid_y + 1) - ray->y) / tan(ray->angle));
+			int intercept_x = (int)floor(ray->x + ((float)(grid_y + 1) - ray->y) / tan(ray->angle));
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (map[grid_y][grid_x])
+				if (is_wall(map, grid_x, grid_y))
 				{
 					if (ray->angle < M_PI_2)
 					{
@@ -72,7 +72,7 @@ struct s_wall	get_wall(char map[7][10], t_ray *ray)
 				}
 			}
 			grid_y++;
-			if (map[grid_y][grid_x])
+			if (is_wall(map, grid_x, grid_y))
 			{
 				wall.type = NORTH;
 				wall.position = grid_y;
@@ -83,11 +83,11 @@ struct s_wall	get_wall(char map[7][10], t_ray *ray)
 	else
 		while (1)
 		{
-			int intercept_x = (int) (ray->x + ((float)grid_y - ray->y) / tan(ray->angle));
+			int intercept_x = (int)floor(ray->x + ((float)grid_y - ray->y) / tan(ray->angle));
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (map[grid_y][grid_x])
+				if (is_wall(map, grid_x, grid_y))
 				{
 					if (ray->angle > 3 * M_PI_2)
 					{
@@ -105,7 +105,7 @@ struct s_wall	get_wall(char map[7][10], t_ray *ray)
 				}
 			}
 			grid_y--;
-			if (map[grid_y][grid_x])
+			if (is_wall(map, grid_x, grid_y))
 			{
 				wall.type = SOUTH;
 				wall.position = grid_y + 1;
@@ -121,12 +121,12 @@ void	render_strip(t_param *param, int x, struct s_wall wall)
 	float dist_x, dist_y;
 	if (wall.type == WEST || wall.type == EAST)
 	{
-		dist_x = wall.position - param->player_x;
+		dist_x = (float)wall.position - param->player_x;
 		dist_y = dist_x * tan(angle);
 	}
 	else
 	{
-		dist_y = wall.position - param->player_y;
+		dist_y = (float)wall.position - param->player_y;
 		dist_x = dist_y / tan(angle);
 	}
 	float depth = fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle)));

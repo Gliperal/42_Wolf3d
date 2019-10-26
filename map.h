@@ -1,28 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   param.h                                            :+:      :+:    :+:   */
+/*   map.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/24 16:04:59 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/26 14:12:45 by nwhitlow         ###   ########.fr       */
+/*   Created: 2019/10/26 14:09:53 by nwhitlow          #+#    #+#             */
+/*   Updated: 2019/10/26 14:12:41 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARAM_H
-# define PARAM_H
+#ifndef MAP_H
+# define MAP_H
 
-# include "map.h"
-
-typedef struct		s_param
+typedef struct	s_map
 {
-	t_input			*input;
-	t_screen		*screen;
-	float			player_x;
-	float			player_y;
-	float			player_angle;
-	t_map			*map;
-}					t_param;
+	char *data;
+	int width;
+	int height;
+}				t_map;
+
+t_map	*load_map();
+int		is_wall(t_map *map, int x, int y);
 
 #endif

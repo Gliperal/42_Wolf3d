@@ -6,22 +6,17 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/25 15:50:13 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/25 19:09:17 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdlib.h>
 #include <math.h>
 
 #include "minilibx_macos/mlx.h"
 #include "rendering/rendering.h"
 #include "input/input.h"
 #include "param.h"
-
-typedef struct	s_coord
-{
-	float x;
-	float y;
-}				t_coord;
 
 typedef struct	s_ray
 {
@@ -30,126 +25,123 @@ typedef struct	s_ray
 	float angle;
 }				t_ray;
 
-struct s_wall
-{
-	float x1, x2, y1, y2;
-};
-
 // TODO REMOVE
 #include <stdio.h>
-
-void	render_strips(t_param *param, int left, int right, struct s_wall wall)
-{
-	t_coord step;
-	t_coord strip;
-	strip.x = wall.x1;
-	strip.y = wall.y1;
-	step.x = (wall.x2 - wall.x1) / (right - left);
-	step.y = (wall.y2 - wall.y1) / (right - left);
-
-	for (int x = left; x <= right; x++)
-	{
-		float diff_x = strip.x - param->player_x;
-		float diff_y = strip.y - param->player_y;
-		float distance = sqrt(diff_x * diff_x + diff_y * diff_y);
-		float height = 1000.0 / distance;
-		for (int y = 360 - height * 2.5; y < 360 + height; y++)
-		{
-			screen_put(param->screen, x, y, 0x7700FF);
-		}
-		strip.x += step.x;
-		strip.y += step.y;
-		if (x == 300)
-		{
-			printf("x = %d\n", x);
-			printf("diff_x = %.2f\n", diff_x);
-			printf("diff_y = %.2f\n", diff_y);
-			printf("distance = %.2f\n", distance);
-			printf("height = %.2f\n", height);
-		}
-	}
-}
+#include <string.h>
 
 # define NORTH 0
 # define SOUTH 1
 # define EAST 2
 # define WEST 3
 
-struct s_wall2	{
+struct s_wall	{
 	char type;
 	int position;
+	int offset;
 };
 
-struct s_wall2	get_wall(t_param *param, t_ray *ray)
+struct s_wall	get_wall(char map[7][10], t_ray *ray)
 {
 //	printf("get_wall(%.2f, %.2f, %.2f)\n", ray->x, ray->y, ray->angle);
 	int grid_y = (int) ray->y;
 	int grid_x = (int) ray->x;
-	struct s_wall2 wall;
+	struct s_wall wall;
 	if (ray->angle < M_PI)
 		while (1)
 		{
 			// possible error if tan(angle) = INF ?
-			int intercept_x = (int) (param->player_x + ((float)(grid_y + 1) - param->player_y) / tan(ray->angle));
+			int intercept_x = (int) (ray->x + ((float)(grid_y + 1) - ray->y) / tan(ray->angle));
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (param->map[grid_y][grid_x])
+				if (map[grid_y][grid_x])
 				{
 					if (ray->angle < M_PI_2)
 					{
 						wall.type = WEST;
 						wall.position = grid_x;
+						wall.offset = grid_y;
 					}
 					else
 					{
 						wall.type = EAST;
 						wall.position = grid_x + 1;
+						wall.offset = grid_y;
 					}
 					return wall;
 				}
 			}
 			grid_y++;
-			if (param->map[grid_y][grid_x])
+			if (map[grid_y][grid_x])
 			{
 				wall.type = NORTH;
 				wall.position = grid_y;
+				wall.offset = grid_x;
 				return wall;
 			}
 		}
 	else
 		while (1)
 		{
-			int intercept_x = (int) (param->player_x + ((float)grid_y - param->player_y) / tan(ray->angle));
+			int intercept_x = (int) (ray->x + ((float)grid_y - ray->y) / tan(ray->angle));
 			while (grid_x != intercept_x)
 			{
 				grid_x += (intercept_x - grid_x) / abs(intercept_x - grid_x);
-				if (param->map[grid_y][grid_x])
+				if (map[grid_y][grid_x])
 				{
 					if (ray->angle > 3 * M_PI_2)
 					{
 						wall.type = WEST;
 						wall.position = grid_x;
+						wall.offset = grid_y;
 					}
 					else
 					{
 						wall.type = EAST;
 						wall.position = grid_x + 1;
+						wall.offset = grid_y;
 					}
 					return wall;
 				}
 			}
 			grid_y--;
-			if (param->map[grid_y][grid_x])
+			if (map[grid_y][grid_x])
 			{
 				wall.type = SOUTH;
 				wall.position = grid_y + 1;
+				wall.offset = grid_x;
 				return wall;
 			}
 		}
 }
 
-void	render_pixel(t_param *param, int x)
+void	render_strip(t_param *param, int x, struct s_wall wall)
+{
+	float angle = param->player_angle + atan2(640, x - 640);
+	float dist_x, dist_y;
+	if (wall.type == WEST || wall.type == EAST)
+	{
+		dist_x = wall.position - param->player_x;
+		dist_y = dist_x * tan(angle);
+	}
+	else
+	{
+		dist_y = wall.position - param->player_y;
+		dist_x = dist_y / tan(angle);
+	}
+	float depth = fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle)));
+	float height = 200.0 / depth;
+	int colors[4] = {0x7700FF, 0x00FF77, 0xCC0077, 0x55CC00};
+	int low = 360 - height * 2.5;
+	if (low < 0) low = 0;
+	int high = 360 + height;
+	if (high > 720)
+		high = 720;
+	for (int y = low; y < high; y++)
+		screen_put(param->screen, x, y, colors[wall.type]);
+}
+
+struct s_wall	get_wall_for_pixel(t_param *param, int x)
 {
 	t_ray ray;
 
@@ -160,30 +152,48 @@ void	render_pixel(t_param *param, int x)
 		ray.angle += 2 * M_PI;
 	ray.x = param->player_x;
 	ray.y = param->player_y;
-	struct s_wall2 wall = get_wall(param, &ray);
-	float dist;
-	if (wall.type == WEST || wall.type == EAST)
+	return get_wall(param->map, &ray);
+}
+
+void	render_swath(t_param *param, int left, struct s_wall *lwall, int right, struct s_wall *rwall)
+{
+	struct s_wall wall_left;
+	struct s_wall wall_right;
+
+	if (lwall == NULL)
 	{
-		float dist_x = wall.position - param->player_x;
-		dist = fabs(dist_x / cos(ray.angle));
+		wall_left = get_wall_for_pixel(param, left);
+		lwall = &wall_left;
 	}
-	else
+	if (rwall == NULL)
 	{
-		float dist_y = wall.position - param->player_y;
-		dist = fabs(dist_y / sin(ray.angle));
+		wall_right = get_wall_for_pixel(param, right);
+		rwall = &wall_right;
 	}
-	float height = 200.0 / dist;
-	int colors[4] = {0x7700FF, 0x00FF77, 0xCC0077, 0x55CC00};
-	for (int y = 360 - height * 2.5; y < 360 + height; y++)
-		screen_put(param->screen, x, y, colors[wall.type]);
+	if (left + 1 >= right)
+	{
+		render_strip(param, left, *lwall);
+		return ;
+	}
+	if (memcmp(lwall, rwall, sizeof(struct s_wall)) == 0)
+	{
+		for (int x = left; x < right; x++)
+			render_strip(param, x, *lwall);
+		return ;
+	}
+	int mid = (left + right) / 2;
+	render_swath(param, left, lwall, mid, NULL);
+	render_swath(param, mid, NULL, right, rwall);
 }
 
 void	render(t_param *param)
 {
-	for (int y = 0; y < 720; y++)
+	for (int y = 0; y < 360; y++)
+		for (int x = 0; x < 1280; x++)
+			screen_put(param->screen, x, y, 0x66DDFF);
+	for (int y = 360; y < 720; y++)
 		for (int x = 0; x < 1280; x++)
 			screen_put(param->screen, x, y, 0x333333);
-	for (int x = 0; x < 1280; x++)
-		render_pixel(param, x);
+	render_swath(param, 0, 0, 1280, 0);
 	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr, param->screen->img_ptr, 0, 0);
 }

@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/25 16:29:01 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/25 17:51:38 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 void	render(t_param *param);
 
-#define PLAYER_SPEED 0.016
+#define PLAYER_SPEED 0.04
 #define PLAYER_RADIUS 0.3
 
 #include <math.h>
@@ -56,14 +56,14 @@ void	move(t_input *input)
 	// rotate view
 	if (key_down(input, ARROW_RIGHT))
 	{
-		param->player_angle -= 0.016;
+		param->player_angle -= 0.04;
 		if (param->player_angle > 2 * M_PI)
 			param->player_angle -= 2 * M_PI;
 		input->exposed = 1;
 	}
 	if (key_down(input, ARROW_LEFT))
 	{
-		param->player_angle += 0.016;
+		param->player_angle += 0.04;
 		if (param->player_angle < 0)
 			param->player_angle += 2 * M_PI;
 		input->exposed = 1;

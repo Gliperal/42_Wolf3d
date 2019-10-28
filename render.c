@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 21:03:24 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 21:47:34 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,30 @@ float	depth_to_wall(t_param *param, int x, t_wall wall, float *wall_offset)
 	return (fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle))));
 }
 
+void	render_entities(t_param *param, int x, float depth_to_wall)
+{
+	// this can be calculated in advance:
+	float dist_x = param->entity_x - param->player_x;
+	float dist_y = param->entity_y - param->player_y;
+	float dist_to_center = hypot(dist_x, dist_y); // TODO greater than dist to wall = discard
+	// ---
+	float ray_angle = param->player_angle + atan2(640, x - 640);
+	float angle_to_entity = ray_angle - atan2(dist_y, dist_x);
+	angle_to_entity = fmod((angle_to_entity + 5 * M_PI_2), 2 * M_PI) - M_PI_2;
+	if (angle_to_entity >= M_PI_2)
+		return ;
+	float dist_to_intercept = dist_to_center * sin(angle_to_entity);
+	if (fabs(dist_to_intercept) < param->entity_radius)
+	{
+		float depth = fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle)));
+		float height = 350.0 * param->entity_radius / depth;
+		int top = 360 - height * 2.5;
+		int bottom = 360 + height;
+		for (int y = top; y < bottom; y++)
+			screen_put(param->screen, x, y, 0x2E159A);
+	}
+}
+
 void	render_strip(t_param *param, int x, t_wall wall)
 {
 	float wall_offset;
@@ -152,6 +176,7 @@ void	render_strip(t_param *param, int x, t_wall wall)
 		screen_put(param->screen, x, y, COLOR_GROUND);
 		y++;
 	}
+	render_entities(param, x, depth);
 }
 
 t_wall	get_wall_for_pixel(t_param *param, int x)

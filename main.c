@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 21:06:39 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 21:35:20 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ int			main(int argc, char **argv)
 	param->player_x = 4.5;
 	param->player_y = 0.5;
 	param->player_angle = 0;
+	param->entity_x = 5.5;
+	param->entity_y = 3.5;
+	param->entity_radius = 0.2;
 	param->map = load_map();
 	if (param->map == NULL)
 	{

@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:59 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 20:37:45 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 21:10:27 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ typedef struct		s_param
 	float			player_angle;
 	t_map			*map;
 	int				**textures;
+	float			entity_x;
+	float			entity_y;
+	float			entity_radius;
 }					t_param;
 
 #endif

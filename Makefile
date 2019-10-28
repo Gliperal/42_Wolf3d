@@ -1,6 +1,8 @@
 CC=gcc
 CFLAGS=
-OBJS=main.o render.o map.o textures.o $(addprefix input/,input.o input_handlers.o input_handle_loop.o input_util.o) rendering/screen.o
+INPUT_OBJS=$(addprefix input/, input.o input_handlers.o input_handle_loop.o input_util.o)
+RENDER_OBJS=rendering/screen.o
+OBJS=main.o render.o map.o textures.o player.o $(INPUT_OBJS) $(RENDER_OBJS)
 FRAMEWORKS=-framework OpenGL -framework AppKit
 RM=rm -rf
 LIBFT=libft

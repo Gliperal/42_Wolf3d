@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 20:14:39 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 21:03:24 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "rendering/rendering.h"
 #include "input/input.h"
 #include "param.h"
+#include "libft/libft.h"
 
 typedef struct	s_ray
 {
@@ -25,80 +26,77 @@ typedef struct	s_ray
 	float angle;
 }				t_ray;
 
-// TODO REMOVE
-#include <stdio.h>
-#include <string.h>
-
+# define COLOR_SKY 0x66DDFF
+# define COLOR_GROUND 0x333333
 # define NORTH 0
 # define SOUTH 1
 # define EAST 2
 # define WEST 3
 
-struct s_wall	{
+typedef struct	s_wall
+{
 	char type;
 	int position;
 	int offset;
-};
+}				t_wall;
 
-struct s_wall	make_wall(int x, int y, int x_normal, int y_normal)
+t_wall	make_wall(int x, int y, int x_normal, int y_normal)
 {
-	struct s_wall wall;
+	t_wall wall;
 
 	if (x_normal == 1)
 	{
 		wall.type = WEST;
 		wall.position = x;
-		wall.offset = y;
 	}
 	else if (x_normal == -1)
 	{
 		wall.type = EAST;
 		wall.position = x + 1;
-		wall.offset = y;
 	}
 	else if (y_normal == 1)
 	{
 		wall.type = NORTH;
 		wall.position = y;
-		wall.offset = x;
 	}
 	else
 	{
 		wall.type = SOUTH;
 		wall.position = y + 1;
-		wall.offset = x;
 	}
+	wall.offset = (x_normal == 0) ? x : y;
 	return (wall);
 }
 
-struct s_wall	get_wall(t_map *map, t_ray *ray)
+t_wall	get_wall(t_map *map, t_ray *ray)
 {
-//	printf("get_wall(%.2f, %.2f, %.2f)\n", ray->x, ray->y, ray->angle);
-	int grid_y = (int) ray->y;
-	int grid_x = (int) ray->x;
-	int dir_x = (ray->angle < M_PI_2 || ray->angle > 3 * M_PI_2) ? 1 : -1;
-	int dir_y = (ray->angle < M_PI) ? 1 : -1;
+	t_point grid;
+	t_point dir;
 	int intercept_x;
+
+	grid.y = (int)ray->y;
+	grid.x = (int)ray->x;
+	dir.x = (ray->angle < M_PI_2 || ray->angle > 3 * M_PI_2) ? 1 : -1;
+	dir.y = (ray->angle < M_PI) ? 1 : -1;
 	while (1)
 	{
-		// possible error if tan(angle) = INF ?
-		if (dir_y == 1)
-			intercept_x = (int)floor(ray->x + ((float)(grid_y + 1) - ray->y) / tan(ray->angle));
+		if (dir.y == 1)
+			intercept_x = (int)floor(ray->x + ((float)(grid.y + 1) - ray->y) / tan(ray->angle));
 		else
-			intercept_x = (int)floor(ray->x + ((float)grid_y - ray->y) / tan(ray->angle));
-		while (grid_x != intercept_x)
+			intercept_x = (int)floor(ray->x + ((float)grid.y - ray->y) / tan(ray->angle));
+		while (grid.x != intercept_x)
 		{
-			grid_x += dir_x;
-			if (is_wall(map, grid_x, grid_y))
-				return (make_wall(grid_x, grid_y, dir_x, 0));
+			grid.x += dir.x;
+			if (is_wall(map, grid.x, grid.y))
+				return (make_wall(grid.x, grid.y, dir.x, 0));
 		}
-		grid_y += dir_y;
-		if (is_wall(map, grid_x, grid_y))
-			return (make_wall(grid_x, grid_y, 0, dir_y));
+		grid.y += dir.y;
+		if (is_wall(map, grid.x, grid.y))
+			return (make_wall(grid.x, grid.y, 0, dir.y));
 	}
 }
 
-float	depth_to_wall(t_param *param, int x, struct s_wall wall, float *wall_offset)
+float	depth_to_wall(t_param *param, int x, t_wall wall, float *wall_offset)
 {
 	float angle;
 	float dist_x;
@@ -123,7 +121,7 @@ float	depth_to_wall(t_param *param, int x, struct s_wall wall, float *wall_offse
 	return (fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle))));
 }
 
-void	render_strip(t_param *param, int x, struct s_wall wall)
+void	render_strip(t_param *param, int x, t_wall wall)
 {
 	float wall_offset;
 	float depth;
@@ -139,7 +137,7 @@ void	render_strip(t_param *param, int x, struct s_wall wall)
 	y = 0;
 	while (y < top)
 	{
-		screen_put(param->screen, x, y, 0x66DDFF);
+		screen_put(param->screen, x, y, COLOR_SKY);
 		y++;
 	}
 	int tex_x = (int)(8.0 * wall_offset);
@@ -151,12 +149,12 @@ void	render_strip(t_param *param, int x, struct s_wall wall)
 	}
 	while (y < 720)
 	{
-		screen_put(param->screen, x, y, 0x333333);
+		screen_put(param->screen, x, y, COLOR_GROUND);
 		y++;
 	}
 }
 
-struct s_wall	get_wall_for_pixel(t_param *param, int x)
+t_wall	get_wall_for_pixel(t_param *param, int x)
 {
 	t_ray ray;
 
@@ -170,10 +168,11 @@ struct s_wall	get_wall_for_pixel(t_param *param, int x)
 	return get_wall(param->map, &ray);
 }
 
-void	render_swath(t_param *param, int left, struct s_wall *lwall, int right, struct s_wall *rwall)
+void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rwall)
 {
-	struct s_wall wall_left;
-	struct s_wall wall_right;
+	t_wall wall_left;
+	t_wall wall_right;
+	int mid;
 
 	if (lwall == NULL)
 	{
@@ -185,18 +184,13 @@ void	render_swath(t_param *param, int left, struct s_wall *lwall, int right, str
 		wall_right = get_wall_for_pixel(param, right);
 		rwall = &wall_right;
 	}
-	if (left + 1 >= right)
-	{
-		render_strip(param, left, *lwall);
-		return ;
-	}
-	if (memcmp(lwall, rwall, sizeof(struct s_wall)) == 0)
+	if (left + 1 >= right || ft_memcmp(lwall, rwall, sizeof(t_wall)) == 0)
 	{
 		for (int x = left; x < right; x++)
 			render_strip(param, x, *lwall);
 		return ;
 	}
-	int mid = (left + right) / 2;
+	mid = (left + right) / 2;
 	render_swath(param, left, lwall, mid, NULL);
 	render_swath(param, mid, NULL, right, rwall);
 }

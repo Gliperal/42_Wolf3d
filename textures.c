@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:05 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/26 16:29:35 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 20:40:57 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #include "textures.h"
 
-# define TEXTURE_SIZE 8
+#define TEXTURE_SIZE 8
 
 # define NORTH 0
 # define SOUTH 1
@@ -48,15 +48,22 @@ static int	*load_texture(const char *filename)
 	return (texture);
 }
 
-int	**load_textures()
+int	**load_textures(void)
 {
-	int **textures = malloc(4 * sizeof(int *));
+	int **textures;
+
+	textures = malloc(4 * sizeof(int *));
 	if (textures == NULL)
 		return (NULL);
-	textures[0] = load_texture("textures/north.bin");
-	textures[1] = load_texture("textures/south.bin");
-	textures[2] = load_texture("textures/east.bin");
-	textures[3] = load_texture("textures/west.bin");
-	// TODO catch errors
-	return (textures);
+	textures[NORTH] = load_texture("textures/north.bin");
+	textures[SOUTH] = load_texture("textures/south.bin");
+	textures[EAST] = load_texture("textures/east.bin");
+	textures[WEST] = load_texture("textures/west.bin");
+	if (textures[NORTH] && textures[SOUTH] && textures[EAST] && textures[WEST])
+		return (textures);
+	free(textures[NORTH]);
+	free(textures[SOUTH]);
+	free(textures[EAST]);
+	free(textures[WEST]);
+	return (NULL);
 }

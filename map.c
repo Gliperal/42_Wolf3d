@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 13:16:48 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/26 14:22:48 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/27 21:05:19 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,30 @@
 #include "libft/libft.h"
 #include "map.h"
 
+static void		copy_data(t_map *old, char *new_data, int new_width)
+{
+	int y;
+	int x;
+
+	y = 0;
+	while (y < old->height)
+	{
+		x = 0;
+		while (x < old->width)
+		{
+			new_data[y * new_width + x] = old->data[y * old->width + x];
+			x++;
+		}
+		y++;
+	}
+}
+
 static int		add_line(t_map *map, char *line)
 {
-	int new_width;
-	int new_height;
-	char *new_data;
-	int x;
+	int		new_width;
+	int		new_height;
+	char	*new_data;
+	int		x;
 
 	new_width = ft_max(map->width, ft_strlen(line));
 	new_height = map->height + 1;
@@ -27,9 +45,7 @@ static int		add_line(t_map *map, char *line)
 	ft_bzero(new_data, new_width * new_height * sizeof(char));
 	if (new_data == NULL)
 		return (-1);
-	for (int y = 0; y < map->height; y++)
-		for (x = 0; x < map->width; x++)
-			new_data[y * new_width + x] = map->data[y * map->width + x];
+	copy_data(map, new_data, new_width);
 	x = 0;
 	while (line[x])
 	{
@@ -44,17 +60,11 @@ static int		add_line(t_map *map, char *line)
 	return (0);
 }
 
-static t_map	*load_map2(int fd)
+static t_map	*fill_map(int fd, t_map *map)
 {
-	char *line;
-	int status;
+	char	*line;
+	int		status;
 
-	t_map *map = malloc(sizeof(t_map));
-	if (map == NULL)
-		return (NULL);
-	map->data = NULL;
-	map->width = 0;
-	map->height = 0;
 	while ((status = get_next_line(fd, &line)) > 0)
 	{
 		if (add_line(map, line) == -1)
@@ -74,10 +84,10 @@ static t_map	*load_map2(int fd)
 	return (map);
 }
 
-t_map	*load_map()
+t_map			*load_map(void)
 {
-	int fd;
-	t_map *map;
+	int		fd;
+	t_map	*map;
 
 	fd = open("map.txt", O_RDONLY);
 	if (fd == -1)
@@ -85,16 +95,22 @@ t_map	*load_map()
 		ft_putstr("Error: Map file could not be opened.\n");
 		return (NULL);
 	}
-	map = load_map2(fd);
+	map = malloc(sizeof(t_map));
+	if (map == NULL)
+		return (NULL);
+	map->data = NULL;
+	map->width = 0;
+	map->height = 0;
+	map = fill_map(fd, map);
 	close(fd);
 	return (map);
 }
 
-int	is_wall(t_map *map, int x, int y)
+int				is_wall(t_map *map, int x, int y)
 {
 	if (x < 0 || y < 0)
-		return 1;
+		return (1);
 	if (x >= map->width || y >= map->height)
-		return 1;
-	return map->data[y * map->width + x];
+		return (1);
+	return (map->data[y * map->width + x]);
 }

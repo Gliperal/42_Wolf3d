@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 21:47:34 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 16:45:33 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "rendering/rendering.h"
 #include "input/input.h"
 #include "param.h"
+#include "textures.h"
 #include "libft/libft.h"
 
 typedef struct	s_ray
@@ -96,87 +97,61 @@ t_wall	get_wall(t_map *map, t_ray *ray)
 	}
 }
 
-float	depth_to_wall(t_param *param, int x, t_wall wall, float *wall_offset)
+void	render_entities(t_param *param, int x, float dist_to_wall)
 {
-	float angle;
-	float dist_x;
-	float dist_y;
-	float foo;
-
-	angle = param->player_angle + atan2(640, x - 640);
-	if (wall.type == WEST || wall.type == EAST)
-	{
-		dist_x = (float)wall.position - param->player_x;
-		dist_y = dist_x * tan(angle);
-		foo = param->player_y + dist_y;
-		*wall_offset = foo - floor(foo);
-	}
-	else
-	{
-		dist_y = (float)wall.position - param->player_y;
-		dist_x = dist_y / tan(angle);
-		foo = param->player_x + dist_x;
-		*wall_offset = foo - floor(foo);
-	}
-	return (fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle))));
-}
-
-void	render_entities(t_param *param, int x, float depth_to_wall)
-{
+	t_ray_collision collision;
 	// this can be calculated in advance:
-	float dist_x = param->entity_x - param->player_x;
-	float dist_y = param->entity_y - param->player_y;
-	float dist_to_center = hypot(dist_x, dist_y); // TODO greater than dist to wall = discard
+	collision.dist_x = param->entity_x - param->player_x; // TODO this is different from the collision dist
+	collision.dist_y = param->entity_y - param->player_y;
+	collision.depth = fabs((collision.dist_y * cos(param->player_angle)) - (collision.dist_x * sin(param->player_angle)));
+	float dist_to_center = hypot(collision.dist_x, collision.dist_y);
+	// this is technically comparing the distance from the center of the entity
+	// with the distance of the ray collision, but it's close enough for all
+	// practical purposes
+	if (dist_to_center > dist_to_wall)
+		return ;
 	// ---
 	float ray_angle = param->player_angle + atan2(640, x - 640);
-	float angle_to_entity = ray_angle - atan2(dist_y, dist_x);
+	float angle_to_entity = ray_angle - atan2(collision.dist_y, collision.dist_x);
 	angle_to_entity = fmod((angle_to_entity + 5 * M_PI_2), 2 * M_PI) - M_PI_2;
 	if (angle_to_entity >= M_PI_2)
 		return ;
 	float dist_to_intercept = dist_to_center * sin(angle_to_entity);
 	if (fabs(dist_to_intercept) < param->entity_radius)
 	{
-		float depth = fabs((dist_y * cos(param->player_angle)) - (dist_x * sin(param->player_angle)));
-		float height = 350.0 * param->entity_radius / depth;
-		int top = 360 - height * 2.5;
-		int bottom = 360 + height;
-		for (int y = top; y < bottom; y++)
-			screen_put(param->screen, x, y, 0x2E159A);
+		collision.texture = param->textures[NORTH];
+		collision.screen_x = x;
+		collision.x_position_on_entity = 0.5 + (dist_to_intercept / param->entity_radius / 2.0);
+		texture_render(param->screen, &collision, -0.5, 0.5);
 	}
 }
 
 void	render_strip(t_param *param, int x, t_wall wall)
 {
-	float wall_offset;
-	float depth;
-	float height;
-	int top;
-	int bottom;
-	int y;
+	t_ray_collision collision;
+	float angle;
+	float foo;
 
-	depth = depth_to_wall(param, x, wall, &wall_offset);
-	height = 200.0 / depth;
-	top = 360 - height * 2.5;
-	bottom = 360 + height;
-	y = 0;
-	while (y < top)
+	angle = param->player_angle + atan2(640, x - 640);
+	if (wall.type == WEST || wall.type == EAST)
 	{
-		screen_put(param->screen, x, y, COLOR_SKY);
-		y++;
+		collision.dist_x = (float)wall.position - param->player_x;
+		collision.dist_y = collision.dist_x * tan(angle);
+		foo = param->player_y + collision.dist_y;
+		collision.x_position_on_entity = foo - floor(foo);
 	}
-	int tex_x = (int)(8.0 * wall_offset);
-	while (y < bottom && y < 720)
+	else
 	{
-		int tex_y = (8 * (y - top)) / (bottom - top);
-		screen_put(param->screen, x, y, param->textures[wall.type][tex_y * 8 + tex_x]);
-		y++;
+		collision.dist_y = (float)wall.position - param->player_y;
+		collision.dist_x = collision.dist_y / tan(angle);
+		foo = param->player_x + collision.dist_x;
+		collision.x_position_on_entity = foo - floor(foo);
 	}
-	while (y < 720)
-	{
-		screen_put(param->screen, x, y, COLOR_GROUND);
-		y++;
-	}
-	render_entities(param, x, depth);
+	collision.depth = fabs((collision.dist_y * cos(param->player_angle)) - (collision.dist_x * sin(param->player_angle)));
+	collision.texture = param->textures[wall.type];
+	collision.screen_x = x;
+	texture_render(param->screen, &collision, -1.0, 2.5);
+	render_entities(param, x, hypot(collision.dist_x, collision.dist_y));
 }
 
 t_wall	get_wall_for_pixel(t_param *param, int x)
@@ -220,8 +195,17 @@ void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rw
 	render_swath(param, mid, NULL, right, rwall);
 }
 
+# define VANISHING_Y 360
+
 void	render(t_param *param)
 {
+	for (int x = 0; x < 1280; x++)
+	{
+		for (int y = 0; y < VANISHING_Y; y++)
+			screen_put(param->screen, x, y, COLOR_SKY);
+		for (int y = VANISHING_Y; y < 720; y++)
+			screen_put(param->screen, x, y, COLOR_GROUND);
+	}
 	render_swath(param, 0, 0, 1280, 0);
 	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr, param->screen->img_ptr, 0, 0);
 }

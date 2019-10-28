@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 21:35:20 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 15:19:44 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ int			main(int argc, char **argv)
 		free(param);
 		return (1);
 	}
-	param->textures = load_textures(); // catch errors
+	param->textures = load_textures();
 	if (param->textures == NULL)
 	{
 		ft_putstr("Failed to load textures.\n");

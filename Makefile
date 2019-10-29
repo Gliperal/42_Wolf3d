@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=
 INPUT_OBJS=$(addprefix input/, input.o input_handlers.o input_handle_loop.o input_util.o)
 RENDER_OBJS=rendering/screen.o
-OBJS=main.o render.o map.o textures.o player.o $(INPUT_OBJS) $(RENDER_OBJS)
+OBJS=main.o render.o map.o textures.o player.o entity.o $(INPUT_OBJS) $(RENDER_OBJS)
 FRAMEWORKS=-framework OpenGL -framework AppKit
 RM=rm -rf
 LIBFT=libft
@@ -20,19 +20,19 @@ $(NAME): $(OBJS) -lft -lmlx
 
 clean:
 	$(RM) $(OBJS)
-	make -C $(LIBFT) clean
+	make -sC $(LIBFT) clean
 
 fclean: clean
 	$(RM) $(NAME)
-	make -C $(LIBFT) fclean
-	make -C $(LIBMLX) clean
+	make -sC $(LIBFT) fclean
+	make -sC $(LIBMLX) clean
 
 re: fclean all
 
 .PHONY: all clean fclean re
 
 $(LIBFT)/libft.a:
-	make -C $(LIBFT)
+	make -sC $(LIBFT)
 
 $(LIBMLX)/libmlx.a:
-	make -C $(LIBMLX)
+	make -sC $(LIBMLX)

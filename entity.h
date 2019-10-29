@@ -1,34 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   param.h                                            :+:      :+:    :+:   */
+/*   entity.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/24 16:04:59 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 17:22:54 by nwhitlow         ###   ########.fr       */
+/*   Created: 2019/10/28 17:21:41 by nwhitlow          #+#    #+#             */
+/*   Updated: 2019/10/28 17:25:35 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARAM_H
-# define PARAM_H
+#ifndef ENTITY_H
+# define ENTITY_H
 
-# include "map.h"
-# include "input/input.h"
-# include "rendering/rendering.h"
-# include "textures.h"
-# include "entity.h"
-
-typedef struct	s_param
+typedef struct	s_entity
 {
-	t_input		*input;
-	t_screen	*screen;
-	float		player_x;
-	float		player_y;
-	float		player_angle;
-	t_map		*map;
-	t_texture	**textures;
-	t_entity	**entities;
-}				t_param;
+	float		x;
+	float		y;
+	float		radius;
+	float		dist_x;
+	float		dist_y;
+	float		dist_to_player;
+	float		angle_from_player;
+	float		depth;
+}				t_entity;
+
+void			prep_entities(void *param);
+void			render_entities(void *param, int x, float dist_to_wall);
 
 #endif

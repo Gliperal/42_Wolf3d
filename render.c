@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 16:45:33 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 17:25:53 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,35 +97,6 @@ t_wall	get_wall(t_map *map, t_ray *ray)
 	}
 }
 
-void	render_entities(t_param *param, int x, float dist_to_wall)
-{
-	t_ray_collision collision;
-	// this can be calculated in advance:
-	collision.dist_x = param->entity_x - param->player_x; // TODO this is different from the collision dist
-	collision.dist_y = param->entity_y - param->player_y;
-	collision.depth = fabs((collision.dist_y * cos(param->player_angle)) - (collision.dist_x * sin(param->player_angle)));
-	float dist_to_center = hypot(collision.dist_x, collision.dist_y);
-	// this is technically comparing the distance from the center of the entity
-	// with the distance of the ray collision, but it's close enough for all
-	// practical purposes
-	if (dist_to_center > dist_to_wall)
-		return ;
-	// ---
-	float ray_angle = param->player_angle + atan2(640, x - 640);
-	float angle_to_entity = ray_angle - atan2(collision.dist_y, collision.dist_x);
-	angle_to_entity = fmod((angle_to_entity + 5 * M_PI_2), 2 * M_PI) - M_PI_2;
-	if (angle_to_entity >= M_PI_2)
-		return ;
-	float dist_to_intercept = dist_to_center * sin(angle_to_entity);
-	if (fabs(dist_to_intercept) < param->entity_radius)
-	{
-		collision.texture = param->textures[NORTH];
-		collision.screen_x = x;
-		collision.x_position_on_entity = 0.5 + (dist_to_intercept / param->entity_radius / 2.0);
-		texture_render(param->screen, &collision, -0.5, 0.5);
-	}
-}
-
 void	render_strip(t_param *param, int x, t_wall wall)
 {
 	t_ray_collision collision;
@@ -199,6 +170,7 @@ void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rw
 
 void	render(t_param *param)
 {
+	prep_entities(param);
 	for (int x = 0; x < 1280; x++)
 	{
 		for (int y = 0; y < VANISHING_Y; y++)

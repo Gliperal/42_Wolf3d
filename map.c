@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 13:16:48 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 21:05:19 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 20:20:42 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static int		add_line(t_map *map, char *line)
 	while (line[x])
 	{
 		if (line[x] != ' ')
-			new_data[(new_height - 1) * new_width + x] = 1;
+			new_data[(new_height - 1) * new_width + x] = line[x];
 		x++;
 	}
 	map->width = new_width;

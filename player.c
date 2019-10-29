@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/27 20:32:24 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/27 20:57:10 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 20:23:53 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #define PLAYER_SPEED 0.04
 #define PLAYER_TURN_SPEED 0.04
 #define PLAYER_RADIUS 0.15
+# define SOLID_BIT 1
 
 static int	collision(t_param *param)
 {
@@ -30,10 +31,10 @@ static int	collision(t_param *param)
 	right = (int)floor(param->player_x + PLAYER_RADIUS);
 	top = (int)floor(param->player_y - PLAYER_RADIUS);
 	bottom = (int)floor(param->player_y + PLAYER_RADIUS);
-	return (is_wall(param->map, left, top)
-		|| is_wall(param->map, left, bottom)
-		|| is_wall(param->map, right, top)
-		|| is_wall(param->map, right, bottom));
+	return ((is_wall(param->map, left, top) & SOLID_BIT)
+		|| (is_wall(param->map, left, bottom) & SOLID_BIT)
+		|| (is_wall(param->map, right, top) & SOLID_BIT)
+		|| (is_wall(param->map, right, bottom) & SOLID_BIT));
 }
 
 void		player_move(t_param *param, t_input *input)

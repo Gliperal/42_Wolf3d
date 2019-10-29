@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 17:07:43 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/28 20:07:45 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void	on_update(void *p)
 int			main(int argc, char **argv)
 {
 	int		*types;
-	int		i;
 	void	*mlx_ptr;
 	t_param	*param;
 
@@ -58,15 +57,9 @@ int			main(int argc, char **argv)
 		exit(1);
 	param->screen = new_screen(mlx_ptr, 1280, 720, "Wolf3D");
 	param->input = input_new(&on_update, param, param->screen);
-	param->player_x = 4.5;
-	param->player_y = 0.5;
+	param->player_x = 8.5;
+	param->player_y = 11.5;
 	param->player_angle = 0;
-	param->entities = malloc(2 * sizeof(t_entity *)); // TODO
-	param->entities[0] = malloc(sizeof(t_entity)); // TODO
-	param->entities[1] = NULL;
-	param->entities[0]->x = 5.5;
-	param->entities[0]->y = 3.5;
-	param->entities[0]->radius = 0.2;
 	param->map = load_map();
 	if (param->map == NULL)
 	{
@@ -81,6 +74,23 @@ int			main(int argc, char **argv)
 		free(param);
 		return (1);
 	}
+	param->entities = malloc(42 * sizeof(t_entity *)); // TODO
+	int i = 0;
+	for (int y = 0; y < param->map->height; y++)
+		for (int x = 0; x < param->map->width; x++)
+		{
+			char *tile = param->map->data + (y * param->map->width + x);
+			if (*tile == 'o')
+			{
+				param->entities[i] = malloc(sizeof(t_entity)); // TODO malloc check
+				param->entities[i]->x = x + 0.5;
+				param->entities[i]->y = y + 0.5;
+				param->entities[i]->radius = 0.2;
+				*tile = 0;
+				i++;
+			}
+		}
+	param->entities[i] = NULL;
 	input_clock_init(param->input);
 	mlx_loop(mlx_ptr);
 }

@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/28 17:08:31 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 20:15:07 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 14:31:46 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,45 @@
 #include "entity.h"
 #include "param.h"
 #include "textures.h"
+
+/*
+** Using bubble sort, because the list will be almost completely sorted already.
+*/
+
+static void	sort_entities(t_entity **entities, int size)
+{
+	int i;
+	t_entity *tmp;
+
+	i = 0;
+	while(i < size - 1)
+	{
+		if (entities[i]->dist_to_player < entities[i + 1]->dist_to_player)
+		{
+			tmp = entities[i];
+			entities[i] = entities[i + 1];
+			entities[i + 1] = tmp;
+			if (i > 0)
+				i--;
+		}
+		else
+			i++;
+	}
+}
+
+static void	collect_gem(t_param *param, int i)
+{
+	free(param->entities[i]);
+	while (1)
+	{
+		param->entities[i] = param->entities[i + 1];
+		if (param->entities[i] == NULL)
+			break ;
+		i++;
+	}
+	param->score++;
+	ft_printf("Your score is now %d\n", param->score);
+}
 
 void	prep_entities(void *p)
 {
@@ -28,11 +67,16 @@ void	prep_entities(void *p)
 		entity->dist_x = entity->x - param->player_x;
 		entity->dist_y = entity->y - param->player_y;
 		entity->dist_to_player = hypot(entity->dist_x, entity->dist_y);
+		if (entity->dist_to_player < 0.5)
+		{
+			collect_gem(param, i);
+			continue;
+		}
 		entity->depth = fabs((entity->dist_y * cos(param->player_angle)) - (entity->dist_x * sin(param->player_angle)));
 		entity->angle_from_player = atan2(entity->dist_y, entity->dist_x);
 		i++;
 	}
-	// TODO sort entities by distance from player
+	sort_entities(param->entities, i);
 }
 
 static void	render_entity(t_param *param, int x, t_entity *entity)
@@ -51,7 +95,7 @@ static void	render_entity(t_param *param, int x, t_entity *entity)
 	dist_to_intercept = entity->dist_to_player * sin(angle_to_entity);
 	if (fabs(dist_to_intercept) < entity->radius)
 	{
-		collision.texture = param->textures[0];
+		collision.texture = param->textures[GEM];
 		collision.screen_x = x;
 		collision.x_position_on_entity = 0.5 + (dist_to_intercept / entity->radius / 2.0);
 		texture_render(param->screen, &collision, -0.5, 0.5);

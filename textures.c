@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:05 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 16:39:24 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 13:50:38 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,6 @@
 #include <math.h>
 
 #include "textures.h"
-
-# define NORTH 0
-# define SOUTH 1
-# define EAST 2
-# define WEST 3
 
 # define VANISHING_Y 360
 
@@ -72,19 +67,21 @@ t_texture			**load_textures(void)
 {
 	t_texture **textures;
 
-	textures = malloc(4 * sizeof(t_texture *));
+	textures = malloc(5 * sizeof(t_texture *));
 	if (textures == NULL)
 		return (NULL);
 	textures[NORTH] = load_texture("textures/north.bin");
 	textures[SOUTH] = load_texture("textures/south.bin");
 	textures[EAST] = load_texture("textures/east.bin");
 	textures[WEST] = load_texture("textures/west.bin");
-	if (textures[NORTH] && textures[SOUTH] && textures[EAST] && textures[WEST])
+	textures[GEM] = load_texture("textures/gem.bin");
+	if (textures[NORTH] && textures[SOUTH] && textures[EAST] && textures[WEST] && textures[GEM])
 		return (textures);
 	free(textures[NORTH]);
 	free(textures[SOUTH]);
 	free(textures[EAST]);
 	free(textures[WEST]);
+	free(textures[GEM]);
 	return (NULL);
 }
 
@@ -96,6 +93,7 @@ void				texture_render(t_screen *screen, t_ray_collision *info, float bottom, fl
 	int y;
 	int tex_x;
 	int tex_y;
+	int color;
 
 	render_top = VANISHING_Y - top * 200.0 / info->depth;
 	render_bottom = VANISHING_Y - bottom * 200.0 / info->depth;
@@ -105,7 +103,9 @@ void				texture_render(t_screen *screen, t_ray_collision *info, float bottom, fl
 	while (y < render_bottom && y < 720)
 	{
 		tex_y = (info->texture->height * (y - render_top)) / render_height;
-		screen_put(screen, info->screen_x, y, info->texture->data[tex_y * info->texture->width + tex_x]);
+		color = info->texture->data[tex_y * info->texture->width + tex_x];
+		if ((color & 0xFF000000) == 0)
+			screen_put(screen, info->screen_x, y, info->texture->data[tex_y * info->texture->width + tex_x]);
 		y++;
 	}
 }

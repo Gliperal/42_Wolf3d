@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 20:07:45 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 14:45:14 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,33 @@
 #include "input/input.h"
 #include "param.h"
 #include "textures.h"
+#include "libft/libft.h"
 
 void	render(t_param *param);
 void	player_move(t_param *param, t_input *input);
 void	player_rotate(t_param *param, t_input *input);
+
+void	render_hud(t_param *param)
+{
+	t_point pos;
+	char score[10];
+
+	if (param->score != 0)
+	{
+		pos.x = 10;
+		pos.y = 10;
+		ft_strcpy(score, "Score: ##");
+		score[7] = '0' + param->score / 10;
+		score[8] = '0' + param->score % 10;
+		screen_putstr(param->screen, pos, 0xFFFFFF, score);
+	}
+	if (param->score == 5)
+	{
+		pos.x = 600;
+		pos.y = 352;
+		screen_putstr(param->screen, pos, 0xFFFFFF, "You win!");
+	}
+}
 
 void	on_update(void *p)
 {
@@ -39,6 +62,7 @@ void	on_update(void *p)
 	if (input->exposed)
 	{
 		render(param);
+		render_hud(param);
 		input->exposed = 0;
 	}
 }
@@ -91,6 +115,7 @@ int			main(int argc, char **argv)
 			}
 		}
 	param->entities[i] = NULL;
+	param->score = 0;
 	input_clock_init(param->input);
 	mlx_loop(mlx_ptr);
 }

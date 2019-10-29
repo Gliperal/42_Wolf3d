@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:59 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 17:22:54 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 14:05:04 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct	s_param
 	t_map		*map;
 	t_texture	**textures;
 	t_entity	**entities;
+	int			score;
 }				t_param;
 
 #endif

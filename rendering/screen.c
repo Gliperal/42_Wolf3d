@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:51:17 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/23 20:57:49 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 14:37:50 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,11 @@ void		screen_put(t_screen *screen, int x, int y, int color)
 	screen->data[offset + 1] = (color >> 8) & 0xff;
 	screen->data[offset + 2] = (color >> 16) & 0xff;
 	screen->data[offset + 3] = color >> 24;
+}
+
+void		screen_putstr(t_screen *screen, t_point pos, int color, char *str)
+{
+	mlx_string_put(screen->mlx_ptr, screen->win_ptr, pos.x, pos.y, color, str);
 }
 
 t_screen	*new_screen(MLX *mlx_ptr, int width, int height, char *title)

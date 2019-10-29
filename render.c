@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 20:23:14 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 13:48:07 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,8 @@ typedef struct	s_ray
 	float angle;
 }				t_ray;
 
-# define COLOR_SKY 0x66DDFF
-# define COLOR_GROUND 0x333333
-# define NORTH 0
-# define SOUTH 1
-# define EAST 2
-# define WEST 3
+# define COLOR_SKY 0x7D4529
+# define COLOR_GROUND 0x4D2A18
 
 typedef struct	s_wall
 {

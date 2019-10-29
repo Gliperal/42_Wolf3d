@@ -6,14 +6,20 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:17 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 16:37:08 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 13:42:38 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TEXTURES_H
 # define TEXTURES_H
 
-#include "rendering/rendering.h"
+# include "rendering/rendering.h"
+
+# define NORTH 0
+# define SOUTH 1
+# define EAST 2
+# define WEST 3
+# define GEM 4
 
 typedef struct	s_texture
 {

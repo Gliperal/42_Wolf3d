@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:45:43 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 21:09:38 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,83 +18,10 @@
 #include "param.h"
 #include "textures.h"
 #include "libft/libft.h"
+#include "world.h"
+#include "ray_casting.h"
 
-typedef struct	s_ray
-{
-	float x;
-	float y;
-	float angle;
-}				t_ray;
-
-# define COLOR_SKY 0x664433
-# define COLOR_GROUND 0x443322
-
-typedef struct	s_wall
-{
-	char type;
-	int position;
-	int offset;
-}				t_wall;
-
-t_wall	make_wall(int x, int y, int x_normal, int y_normal)
-{
-	t_wall wall;
-
-	if (x_normal == 1)
-	{
-		wall.type = WEST;
-		wall.position = x;
-	}
-	else if (x_normal == -1)
-	{
-		wall.type = EAST;
-		wall.position = x + 1;
-	}
-	else if (y_normal == 1)
-	{
-		wall.type = NORTH;
-		wall.position = y;
-	}
-	else
-	{
-		wall.type = SOUTH;
-		wall.position = y + 1;
-	}
-	wall.offset = (x_normal == 0) ? x : y;
-	return (wall);
-}
-
-t_wall	get_wall(t_map *map, t_ray *ray)
-{
-	t_point	grid;
-	t_point	dir;
-	int		intercept_x;
-
-	grid.y = (int)ray->y;
-	grid.x = (int)ray->x;
-	dir.x = (ray->angle < M_PI_2 || ray->angle > 3 * M_PI_2) ? 1 : -1;
-	dir.y = (ray->angle < M_PI) ? 1 : -1;
-	while (1)
-	{
-		if (dir.y == 1)
-			intercept_x = (int)floor(ray->x + ((float)(grid.y + 1) - ray->y) /
-															tan(ray->angle));
-		else
-			intercept_x = (int)floor(ray->x + ((float)grid.y - ray->y) /
-															tan(ray->angle));
-		while (grid.x != intercept_x)
-		{
-			grid.x += dir.x;
-			if (is_wall(map, grid.x, grid.y))
-				return (make_wall(grid.x, grid.y, dir.x, 0));
-		}
-		grid.y += dir.y;
-		if (is_wall(map, grid.x, grid.y))
-			return (make_wall(grid.x, grid.y, 0, dir.y));
-	}
-}
-
-void	render_strip(t_param *param, int x, t_wall wall)
+static void	render_strip(t_param *param, int x, t_wall wall)
 {
 	t_ray_collision	collision;
 	float			angle;
@@ -123,62 +50,68 @@ void	render_strip(t_param *param, int x, t_wall wall)
 	render_entities(param, x, hypot(collision.dist_x, collision.dist_y));
 }
 
-t_wall	get_wall_for_pixel(t_param *param, int x)
-{
-	t_ray ray;
+#define LEFT 0
+#define RIGHT 1
 
-	ray.angle = param->player_angle + atan2(640, x - 640);
-	if (ray.angle > 2 * M_PI)
-		ray.angle -= 2 * M_PI;
-	if (ray.angle < 0)
-		ray.angle += 2 * M_PI;
-	ray.x = param->player_x;
-	ray.y = param->player_y;
-	return (get_wall(param->map, &ray));
-}
-
-void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rwall)
+static void	render_swath(t_param *param, int range[2],
+												t_wall *lwall, t_wall *rwall)
 {
-	t_wall wall_left;
-	t_wall wall_right;
-	int mid;
-	int x;
+	t_wall	wall_left;
+	t_wall	wall_right;
+	int		mid;
 
 	if (lwall == NULL)
 	{
-		wall_left = get_wall_for_pixel(param, left);
+		wall_left = get_wall_for_pixel(param, range[LEFT]);
 		lwall = &wall_left;
 	}
 	if (rwall == NULL)
 	{
-		wall_right = get_wall_for_pixel(param, right);
+		wall_right = get_wall_for_pixel(param, range[RIGHT]);
 		rwall = &wall_right;
 	}
-	if (left + 1 >= right || ft_memcmp(lwall, rwall, sizeof(t_wall)) == 0)
+	if (range[LEFT] + 1 >= range[RIGHT] ||
+								ft_memcmp(lwall, rwall, sizeof(t_wall)) == 0)
 	{
-		x = left;
-		while (x < right)
-		{
-			render_strip(param, x, *lwall);
-			x++;
-		}
+		while (range[LEFT] < range[RIGHT])
+			render_strip(param, range[LEFT]++, *lwall);
 		return ;
 	}
-	mid = (left + right) / 2;
-	render_swath(param, left, lwall, mid, NULL);
-	render_swath(param, mid, NULL, right, rwall);
+	mid = (range[LEFT] + range[RIGHT]) / 2;
+	render_swath(param, (int[2]){range[LEFT], mid}, lwall, NULL);
+	render_swath(param, (int[2]){mid, range[RIGHT]}, NULL, rwall);
 }
 
-# define VANISHING_Y 360
+static void	render_hud(t_param *param)
+{
+	t_point	pos;
+	char	score[10];
 
-void	render(t_param *param)
+	if (param->score != 0)
+	{
+		pos.x = 10;
+		pos.y = 10;
+		ft_strcpy(score, "Score: ##");
+		score[7] = '0' + param->score / 10;
+		score[8] = '0' + param->score % 10;
+		screen_putstr(param->screen, pos, 0xFFFFFF, score);
+	}
+	if (param->score == 42)
+	{
+		pos.x = 600;
+		pos.y = 352;
+		screen_putstr(param->screen, pos, 0xFFFFFF, "You win!");
+	}
+}
+
+void		render(t_param *param)
 {
 	int x;
 	int y;
 
 	prep_entities(param);
 	x = 0;
-	while (x < 1280)
+	while (x < SCREEN_WIDTH)
 	{
 		y = 0;
 		while (y < VANISHING_Y)
@@ -186,14 +119,15 @@ void	render(t_param *param)
 			screen_put(param->screen, x, y, COLOR_SKY);
 			y++;
 		}
-		while (y < 720)
+		while (y < SCREEN_HEIGHT)
 		{
 			screen_put(param->screen, x, y, COLOR_GROUND);
 			y++;
 		}
 		x++;
 	}
-	render_swath(param, 0, 0, 1280, 0);
+	render_swath(param, (int[2]){0, SCREEN_WIDTH}, 0, 0);
 	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr,
 												param->screen->img_ptr, 0, 0);
+	render_hud(param);
 }

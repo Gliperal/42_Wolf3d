@@ -1,35 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   entity.h                                           :+:      :+:    :+:   */
+/*   ray_casting.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/28 17:21:41 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 20:54:36 by nwhitlow         ###   ########.fr       */
+/*   Created: 2019/10/29 21:02:47 by nwhitlow          #+#    #+#             */
+/*   Updated: 2019/10/29 21:08:35 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENTITY_H
-# define ENTITY_H
+#ifndef RAY_CASTING_H
+# define RAY_CASTING_H
 
-# include "map.h"
+# include "param.h"
 
-typedef struct	s_entity
+typedef struct	s_ray
 {
-	float		x;
-	float		y;
-	float		radius;
-	float		dist_x;
-	float		dist_y;
-	float		dist_to_player;
-	float		angle_from_player;
-	float		depth;
-}				t_entity;
+	float x;
+	float y;
+	float angle;
+}				t_ray;
 
-void			prep_entities(void *param);
-void			render_entities(void *param, int x, float dist_to_wall);
-void			free_entities(t_entity **entities);
-t_entity		**extract_entities(t_map *map);
+typedef struct	s_wall
+{
+	char	type;
+	int		position;
+	int		offset;
+}				t_wall;
+
+t_wall			get_wall_for_pixel(t_param *param, int x);
 
 #endif

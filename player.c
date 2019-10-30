@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/27 20:32:24 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:45:35 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 19:04:48 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,21 @@ static int	collision(t_param *param)
 		|| (is_wall(param->map, right, bottom) & SOLID_BIT));
 }
 
+static int	get_movement(t_input *input, int *front_back, int *left_right)
+{
+	*front_back = 0;
+	*left_right = 0;
+	if (key_down(input, KEY_W))
+		*front_back += 1;
+	if (key_down(input, KEY_A))
+		*left_right -= 1;
+	if (key_down(input, KEY_S))
+		*front_back -= 1;
+	if (key_down(input, KEY_D))
+		*left_right += 1;
+	return (*left_right || *front_back);
+}
+
 void		player_move(t_param *param, t_input *input)
 {
 	int		front_back;
@@ -45,21 +60,11 @@ void		player_move(t_param *param, t_input *input)
 	float	angle;
 	float	speed;
 
-	front_back = 0;
-	left_right = 0;
-	if (key_down(input, KEY_W))
-		front_back++;
-	if (key_down(input, KEY_A))
-		left_right--;
-	if (key_down(input, KEY_S))
-		front_back--;
-	if (key_down(input, KEY_D))
-		left_right++;
-	speed = PLAYER_SPEED;
-	if (key_down(input, SHIFT) || key_down(input, RSHIFT))
-		speed *= SHIFT_MODIFIER;
-	if (left_right || front_back)
+	if (get_movement(input, &front_back, &left_right))
 	{
+		speed = PLAYER_SPEED;
+		if (key_down(input, SHIFT) || key_down(input, RSHIFT))
+			speed *= SHIFT_MODIFIER;
 		angle = param->player_angle + atan2(front_back, left_right);
 		param->player_y += speed * sin(angle);
 		if (collision(param))

@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:05 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:18:58 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 20:42:32 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@
 #include <math.h>
 
 #include "textures.h"
-
-# define VANISHING_Y 360
+#include "world.h"
 
 static int			read_texture(int fd, t_texture *texture)
 {
@@ -99,7 +98,7 @@ void				texture_render(t_screen *screen, t_ray_collision *info,
 	render_bottom = VANISHING_Y - bottom * 200.0 / info->depth;
 	tex.x = (int)(info->x_position_on_entity * info->texture->width);
 	y = ft_max(0, render_top);
-	while (y < render_bottom && y < 720)
+	while (y < render_bottom && y < SCREEN_HEIGHT)
 	{
 		tex.y = (info->texture->height * (y - render_top)) /
 												(render_bottom - render_top);

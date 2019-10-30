@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 13:16:48 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:34:47 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 21:11:47 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,15 +104,6 @@ t_map			*load_map(void)
 	map = fill_map(fd, map);
 	close(fd);
 	return (map);
-}
-
-int				is_wall(t_map *map, int x, int y)
-{
-	if (x < 0 || y < 0)
-		return (1);
-	if (x >= map->width || y >= map->height)
-		return (1);
-	return (map->data[y * map->width + x]);
 }
 
 void			free_map(t_map *map)

@@ -1,0 +1,35 @@
+entity_rendering.c
+	* sort_entities
+	* collect_gem
+	prep_entities
+	* render_entity
+	render_entities
+
+entity.c
+	* add_entity
+	extract_entities
+	free_entities
+
+map.c
+	* copy_data
+	* add_line
+	* fill_map
+	load_map
+	is_wall
+	free_map
+
+main.c
+	on_update
+	* param_init2
+	* param_init
+	main
+
+render.c
+	* make_wall
+	* ray_x_intercept
+	* get_wall
+	* get_wall_for_pixel
+	* render_strip
+	* render_swath
+	* render_hud
+	render

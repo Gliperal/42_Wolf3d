@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/28 17:08:31 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 21:00:34 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/30 14:05:41 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ static void	sort_entities(t_entity **entities, int size)
 	}
 }
 
-#define SFX_GEM "gem.mp3"
+#define SFX_GEM "gem2.wav"
 
 static void	collect_gem(t_param *param, int i)
 {
-	system("afplay " SFX_GEM " 2> /dev/null");
+	system("afplay " SFX_GEM " 2> /dev/null &");
 	free(param->entities[i]);
 	while (1)
 	{

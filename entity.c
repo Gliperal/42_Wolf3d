@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/28 17:08:31 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 14:31:46 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:29:11 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@
 
 static void	sort_entities(t_entity **entities, int size)
 {
-	int i;
-	t_entity *tmp;
+	int			i;
+	t_entity	*tmp;
 
 	i = 0;
-	while(i < size - 1)
+	while (i < size - 1)
 	{
 		if (entities[i]->dist_to_player < entities[i + 1]->dist_to_player)
 		{
@@ -41,8 +41,11 @@ static void	sort_entities(t_entity **entities, int size)
 	}
 }
 
+#define SFX_GEM "gem.mp3"
+
 static void	collect_gem(t_param *param, int i)
 {
+	system("afplay " SFX_GEM " 2> /dev/null");
 	free(param->entities[i]);
 	while (1)
 	{
@@ -52,15 +55,15 @@ static void	collect_gem(t_param *param, int i)
 		i++;
 	}
 	param->score++;
-	ft_printf("Your score is now %d\n", param->score);
 }
 
 void	prep_entities(void *p)
 {
-	t_entity *entity;
-	int i;
-	t_param *param = p;
+	t_entity	*entity;
+	int			i;
+	t_param		*param;
 
+	param = p;
 	i = 0;
 	while ((entity = param->entities[i]))
 	{
@@ -72,7 +75,8 @@ void	prep_entities(void *p)
 			collect_gem(param, i);
 			continue;
 		}
-		entity->depth = fabs((entity->dist_y * cos(param->player_angle)) - (entity->dist_x * sin(param->player_angle)));
+		entity->depth = fabs((entity->dist_y * cos(param->player_angle)) -
+									(entity->dist_x * sin(param->player_angle)));
 		entity->angle_from_player = atan2(entity->dist_y, entity->dist_x);
 		i++;
 	}
@@ -81,10 +85,10 @@ void	prep_entities(void *p)
 
 static void	render_entity(t_param *param, int x, t_entity *entity)
 {
-	t_ray_collision collision;
-	float ray_angle;
-	float angle_to_entity;
-	float dist_to_intercept;
+	t_ray_collision	collision;
+	float			ray_angle;
+	float			angle_to_entity;
+	float			dist_to_intercept;
 
 	collision.depth = entity->depth;
 	ray_angle = param->player_angle + atan2(640, x - 640);
@@ -97,17 +101,20 @@ static void	render_entity(t_param *param, int x, t_entity *entity)
 	{
 		collision.texture = param->textures[GEM];
 		collision.screen_x = x;
-		collision.x_position_on_entity = 0.5 + (dist_to_intercept / entity->radius / 2.0);
+		collision.x_position_on_entity = 0.5 +
+									(dist_to_intercept / entity->radius / 2.0);
 		texture_render(param->screen, &collision, -0.5, 0.5);
 	}
 }
 
 void	render_entities(void *p, int x, float dist_to_wall)
 {
-	t_param *param = p;
+	t_param *param;
 	t_entity *entity;
+	int i;
 
-	int i = 0;
+	param = p;
+	i = 0;
 	while ((entity = param->entities[i]))
 	{
 		// this is technically comparing the distance from the center of the entity

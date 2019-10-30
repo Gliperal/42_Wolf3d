@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 13:16:48 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/28 20:20:42 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:34:47 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,4 +113,10 @@ int				is_wall(t_map *map, int x, int y)
 	if (x >= map->width || y >= map->height)
 		return (1);
 	return (map->data[y * map->width + x]);
+}
+
+void			free_map(t_map *map)
+{
+	free(map->data);
+	free(map);
 }

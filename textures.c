@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:05 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 13:50:38 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:18:58 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ t_texture			**load_textures(void)
 	textures[EAST] = load_texture("textures/east.bin");
 	textures[WEST] = load_texture("textures/west.bin");
 	textures[GEM] = load_texture("textures/gem.bin");
-	if (textures[NORTH] && textures[SOUTH] && textures[EAST] && textures[WEST] && textures[GEM])
+	if (textures[NORTH] && textures[SOUTH] && textures[EAST]
+			&& textures[WEST] && textures[GEM])
 		return (textures);
 	free(textures[NORTH]);
 	free(textures[SOUTH]);
@@ -85,27 +86,40 @@ t_texture			**load_textures(void)
 	return (NULL);
 }
 
-void				texture_render(t_screen *screen, t_ray_collision *info, float bottom, float top)
+void				texture_render(t_screen *screen, t_ray_collision *info,
+														float bottom, float top)
 {
-	int render_top;
-	int render_bottom;
-	int render_height;
-	int y;
-	int tex_x;
-	int tex_y;
-	int color;
+	int		render_top;
+	int		render_bottom;
+	int		y;
+	t_point	tex;
+	int		color;
 
 	render_top = VANISHING_Y - top * 200.0 / info->depth;
 	render_bottom = VANISHING_Y - bottom * 200.0 / info->depth;
-	render_height = render_bottom - render_top;
-	tex_x = (int)(info->x_position_on_entity * info->texture->width);
+	tex.x = (int)(info->x_position_on_entity * info->texture->width);
 	y = ft_max(0, render_top);
 	while (y < render_bottom && y < 720)
 	{
-		tex_y = (info->texture->height * (y - render_top)) / render_height;
-		color = info->texture->data[tex_y * info->texture->width + tex_x];
+		tex.y = (info->texture->height * (y - render_top)) /
+												(render_bottom - render_top);
+		color = info->texture->data[tex.y * info->texture->width + tex.x];
 		if ((color & 0xFF000000) == 0)
-			screen_put(screen, info->screen_x, y, info->texture->data[tex_y * info->texture->width + tex_x]);
+			screen_put(screen, info->screen_x, y, color);
 		y++;
 	}
+}
+
+void				free_textures(t_texture **textures)
+{
+	int i;
+
+	i = 0;
+	while (i < 5)
+	{
+		free(textures[i]->data);
+		free(textures[i]);
+		i++;
+	}
+	free(textures);
 }

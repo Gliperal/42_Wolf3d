@@ -6,18 +6,14 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 19:54:33 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 14:45:14 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:50:23 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // TODO -WWW
 
-// TODO Remove
-#include <stdio.h>
-
 #include "minilibx_macos/mlx.h"
-#include "rendering/rendering.h"
-#include "input/input.h"
+#include "engine/engine.h"
 #include "param.h"
 #include "textures.h"
 #include "libft/libft.h"
@@ -28,8 +24,8 @@ void	player_rotate(t_param *param, t_input *input);
 
 void	render_hud(t_param *param)
 {
-	t_point pos;
-	char score[10];
+	t_point	pos;
+	char	score[10];
 
 	if (param->score != 0)
 	{
@@ -40,7 +36,7 @@ void	render_hud(t_param *param)
 		score[8] = '0' + param->score % 10;
 		screen_putstr(param->screen, pos, 0xFFFFFF, score);
 	}
-	if (param->score == 5)
+	if (param->score == 42)
 	{
 		pos.x = 600;
 		pos.y = 352;
@@ -56,7 +52,16 @@ void	on_update(void *p)
 	param = p;
 	input = param->input;
 	if (input->key_states[ESC] == PRESSED)
+	{
+		free_textures(param->textures);
+		free_map(param->map);
+		for (int i = 0; param->entities[i]; i++)
+			free(param->entities[i]);
+		free(param->entities);
+		destroy_screen(param->screen);
+		free(param);
 		exit(0);
+	}
 	player_move(param, input);
 	player_rotate(param, input);
 	if (input->exposed)
@@ -67,9 +72,8 @@ void	on_update(void *p)
 	}
 }
 
-int			main(int argc, char **argv)
+int			main()
 {
-	int		*types;
 	void	*mlx_ptr;
 	t_param	*param;
 

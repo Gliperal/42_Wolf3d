@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 13:57:37 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/23 20:04:30 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:51:01 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 # define INPUT_H
 
 # include "../libft/libft.h"
-# include "../rendering/mlx_util.h"
+# include "mlx_util.h"
+# include "button_codes.h"
+# include "screen.h"
 
 # define UPDATE_INTERVAL 16666666L
 # define NSEC_IN_SEC 1000000000L

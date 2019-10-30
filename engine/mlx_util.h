@@ -1,27 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map.h                                              :+:      :+:    :+:   */
+/*   mlx_util.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/26 14:09:53 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:50:37 by nwhitlow         ###   ########.fr       */
+/*   Created: 2019/06/30 21:19:41 by nwhitlow          #+#    #+#             */
+/*   Updated: 2019/10/29 18:46:28 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAP_H
-# define MAP_H
+#ifndef MLX_UTIL_H
+# define MLX_UTIL_H
 
-typedef struct	s_map
-{
-	char	*data;
-	int		width;
-	int		height;
-}				t_map;
+# define MLX void
+# define MLX_WIN void
+# define MLX_IMG void
 
-t_map			*load_map();
-int				is_wall(t_map *map, int x, int y);
-void			free_map(t_map *map);
+typedef unsigned char	t_byte;
 
 #endif

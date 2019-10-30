@@ -6,16 +6,15 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:59 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 14:05:04 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:49:24 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARAM_H
 # define PARAM_H
 
+# include "engine/engine.h"
 # include "map.h"
-# include "input/input.h"
-# include "rendering/rendering.h"
 # include "textures.h"
 # include "entity.h"
 

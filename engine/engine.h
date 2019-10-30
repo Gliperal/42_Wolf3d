@@ -1,27 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map.h                                              :+:      :+:    :+:   */
+/*   engine.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/26 14:09:53 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 18:50:37 by nwhitlow         ###   ########.fr       */
+/*   Created: 2019/06/30 21:19:41 by nwhitlow          #+#    #+#             */
+/*   Updated: 2019/10/29 18:49:08 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAP_H
-# define MAP_H
+#ifndef ENGINE_H
+# define ENGINE_H
 
-typedef struct	s_map
-{
-	char	*data;
-	int		width;
-	int		height;
-}				t_map;
-
-t_map			*load_map();
-int				is_wall(t_map *map, int x, int y);
-void			free_map(t_map *map);
+# include "mlx_util.h"
+# include "screen.h"
+# include "input.h"
+# include "input_handlers.h"
 
 #endif

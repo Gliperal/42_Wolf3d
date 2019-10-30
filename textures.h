@@ -6,14 +6,14 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/26 16:22:17 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 13:42:38 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:49:44 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TEXTURES_H
 # define TEXTURES_H
 
-# include "rendering/rendering.h"
+# include "engine/engine.h"
 
 # define NORTH 0
 # define SOUTH 1
@@ -40,6 +40,8 @@ typedef struct	s_ray_collision
 }				t_ray_collision;
 
 t_texture		**load_textures();
-void			texture_render(t_screen *screen, t_ray_collision *info, float bottom, float top);
+void			texture_render(t_screen *screen, t_ray_collision *info,
+													float bottom, float top);
+void			free_textures(t_texture **textures);
 
 #endif

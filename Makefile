@@ -1,8 +1,7 @@
 CC=gcc
-CFLAGS=
-INPUT_OBJS=$(addprefix input/, input.o input_handlers.o input_handle_loop.o input_util.o)
-RENDER_OBJS=rendering/screen.o
-OBJS=main.o render.o map.o textures.o player.o entity.o $(INPUT_OBJS) $(RENDER_OBJS)
+CFLAGS=-Wall -Wextra -Werror
+ENGINE_OBJS=$(addprefix engine/, input.o input_handlers.o input_handle_loop.o input_util.o screen.o)
+OBJS=main.o render.o map.o textures.o player.o entity.o $(ENGINE_OBJS)
 FRAMEWORKS=-framework OpenGL -framework AppKit
 RM=rm -rf
 LIBFT=libft
@@ -29,7 +28,14 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+norme:
+	norminette libft/*.[ch]
+	norminette libft/ft_printf/*.[ch]
+	norminette input/*.[ch]
+	norminette rendering/*.[ch]
+	norminette *.[ch]
+
+.PHONY: all clean fclean re norme
 
 $(LIBFT)/libft.a:
 	make -sC $(LIBFT)

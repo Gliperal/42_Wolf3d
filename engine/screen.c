@@ -6,13 +6,13 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:51:17 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 14:37:50 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:51:52 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 
-#include "mlx_util.h"
+#include "screen.h"
 #include "../minilibx_macos/mlx.h"
 #include "../libft/libft.h"
 
@@ -74,4 +74,11 @@ t_screen	*new_screen(MLX *mlx_ptr, int width, int height, char *title)
 	screen->width = width;
 	screen->height = height;
 	return (screen);
+}
+
+void		destroy_screen(t_screen *screen)
+{
+	mlx_destroy_window(screen->mlx_ptr, screen->win_ptr);
+	mlx_destroy_image(screen->mlx_ptr, screen->img_ptr);
+	free(screen);
 }

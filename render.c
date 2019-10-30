@@ -6,7 +6,7 @@
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/24 16:04:27 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/10/29 13:48:07 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:45:43 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 #include <math.h>
 
 #include "minilibx_macos/mlx.h"
-#include "rendering/rendering.h"
-#include "input/input.h"
+#include "engine/engine.h"
 #include "param.h"
 #include "textures.h"
 #include "libft/libft.h"
@@ -27,8 +26,8 @@ typedef struct	s_ray
 	float angle;
 }				t_ray;
 
-# define COLOR_SKY 0x7D4529
-# define COLOR_GROUND 0x4D2A18
+# define COLOR_SKY 0x664433
+# define COLOR_GROUND 0x443322
 
 typedef struct	s_wall
 {
@@ -67,9 +66,9 @@ t_wall	make_wall(int x, int y, int x_normal, int y_normal)
 
 t_wall	get_wall(t_map *map, t_ray *ray)
 {
-	t_point grid;
-	t_point dir;
-	int intercept_x;
+	t_point	grid;
+	t_point	dir;
+	int		intercept_x;
 
 	grid.y = (int)ray->y;
 	grid.x = (int)ray->x;
@@ -78,9 +77,11 @@ t_wall	get_wall(t_map *map, t_ray *ray)
 	while (1)
 	{
 		if (dir.y == 1)
-			intercept_x = (int)floor(ray->x + ((float)(grid.y + 1) - ray->y) / tan(ray->angle));
+			intercept_x = (int)floor(ray->x + ((float)(grid.y + 1) - ray->y) /
+															tan(ray->angle));
 		else
-			intercept_x = (int)floor(ray->x + ((float)grid.y - ray->y) / tan(ray->angle));
+			intercept_x = (int)floor(ray->x + ((float)grid.y - ray->y) /
+															tan(ray->angle));
 		while (grid.x != intercept_x)
 		{
 			grid.x += dir.x;
@@ -95,9 +96,9 @@ t_wall	get_wall(t_map *map, t_ray *ray)
 
 void	render_strip(t_param *param, int x, t_wall wall)
 {
-	t_ray_collision collision;
-	float angle;
-	float foo;
+	t_ray_collision	collision;
+	float			angle;
+	float			foo;
 
 	angle = param->player_angle + atan2(640, x - 640);
 	if (wall.type == WEST || wall.type == EAST)
@@ -114,8 +115,9 @@ void	render_strip(t_param *param, int x, t_wall wall)
 		foo = param->player_x + collision.dist_x;
 		collision.x_position_on_entity = foo - floor(foo);
 	}
-	collision.depth = fabs((collision.dist_y * cos(param->player_angle)) - (collision.dist_x * sin(param->player_angle)));
-	collision.texture = param->textures[wall.type];
+	collision.depth = fabs((collision.dist_y * cos(param->player_angle)) -
+								(collision.dist_x * sin(param->player_angle)));
+	collision.texture = param->textures[(int)wall.type];
 	collision.screen_x = x;
 	texture_render(param->screen, &collision, -1.0, 2.5);
 	render_entities(param, x, hypot(collision.dist_x, collision.dist_y));
@@ -132,7 +134,7 @@ t_wall	get_wall_for_pixel(t_param *param, int x)
 		ray.angle += 2 * M_PI;
 	ray.x = param->player_x;
 	ray.y = param->player_y;
-	return get_wall(param->map, &ray);
+	return (get_wall(param->map, &ray));
 }
 
 void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rwall)
@@ -140,6 +142,7 @@ void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rw
 	t_wall wall_left;
 	t_wall wall_right;
 	int mid;
+	int x;
 
 	if (lwall == NULL)
 	{
@@ -153,8 +156,12 @@ void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rw
 	}
 	if (left + 1 >= right || ft_memcmp(lwall, rwall, sizeof(t_wall)) == 0)
 	{
-		for (int x = left; x < right; x++)
+		x = left;
+		while (x < right)
+		{
 			render_strip(param, x, *lwall);
+			x++;
+		}
 		return ;
 	}
 	mid = (left + right) / 2;
@@ -166,14 +173,27 @@ void	render_swath(t_param *param, int left, t_wall *lwall, int right, t_wall *rw
 
 void	render(t_param *param)
 {
+	int x;
+	int y;
+
 	prep_entities(param);
-	for (int x = 0; x < 1280; x++)
+	x = 0;
+	while (x < 1280)
 	{
-		for (int y = 0; y < VANISHING_Y; y++)
+		y = 0;
+		while (y < VANISHING_Y)
+		{
 			screen_put(param->screen, x, y, COLOR_SKY);
-		for (int y = VANISHING_Y; y < 720; y++)
+			y++;
+		}
+		while (y < 720)
+		{
 			screen_put(param->screen, x, y, COLOR_GROUND);
+			y++;
+		}
+		x++;
 	}
 	render_swath(param, 0, 0, 1280, 0);
-	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr, param->screen->img_ptr, 0, 0);
+	mlx_put_image_to_window(param->screen->mlx_ptr, param->screen->win_ptr,
+												param->screen->img_ptr, 0, 0);
 }

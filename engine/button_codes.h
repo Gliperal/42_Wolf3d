@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mlx_util.h                                         :+:      :+:    :+:   */
+/*   button_codes.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nwhitlow <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/30 21:19:41 by nwhitlow          #+#    #+#             */
-/*   Updated: 2019/07/04 16:02:29 by nwhitlow         ###   ########.fr       */
+/*   Updated: 2019/10/29 18:44:01 by nwhitlow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MLX_UTIL_H
-# define MLX_UTIL_H
+#ifndef BUTTON_CODES_H
+# define BUTTON_CODES_H
 
 # define LCLICK 1
 # define RCLICK 2
@@ -117,24 +117,5 @@
 # define FN 279
 
 # define MAX_KEYS 279
-
-# define MLX void
-# define MLX_WIN void
-# define MLX_IMG void
-
-typedef unsigned char	t_byte;
-
-typedef struct	s_screen
-{
-	int			width;
-	int			height;
-	MLX			*mlx_ptr;
-	MLX_WIN		*win_ptr;
-	MLX_IMG		*img_ptr;
-	t_byte		*data;
-	int			bpp;
-	int			size_line;
-	int			endian;
-}				t_screen;
 
 #endif
